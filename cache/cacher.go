@@ -6,16 +6,16 @@ import (
 )
 
 var Mutex = &sync.Mutex{}
-var schedules = map[int]map[int][]int{}
+var schedules = map[int]string{}
 
-func Get(busStop int) (map[int][]int, error) {
+func Get(busStop int) (string, error) {
 	if _, ok := schedules[busStop]; !ok {
-		return nil, errors.New("Bus stop was not found")
+		return "", errors.New("Bus stop was not found")
 	}
 	return schedules[busStop], nil
 }
 
-func Set(busStop int, schedule map[int][]int) {
+func Set(busStop int, schedule string) {
 	schedules[busStop] = schedule
 }
 
