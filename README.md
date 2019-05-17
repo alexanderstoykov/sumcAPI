@@ -19,3 +19,8 @@ dep ensure
 * dep executable is located in bin folder inside your GO path
 ```
 Dep will go through your local GOPATH directory and add files there into Gopkg.lock, and into the vendor folder.
+
+### To do
+- [x] Initiate working code
+- [ ] Implement interfaces & DI
+- [ ] Unit tests
