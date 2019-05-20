@@ -22,5 +22,6 @@ Dep will go through your local GOPATH directory and add files there into Gopkg.l
 
 ### To do
 - [x] Initiate working code
+- [ ] Implement rate limiter
 - [ ] Implement interfaces & DI
 - [ ] Unit tests
