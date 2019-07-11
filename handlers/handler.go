@@ -1,12 +1,10 @@
 package handlers
 
 import (
-	"github.com/gin-gonic/gin"
-	"time"
-	"strconv"
-	"math"
-	"sumcAPI/services"
 	"errors"
+	"github.com/gin-gonic/gin"
+	"strconv"
+	"sumcAPI/interfaces"
 )
 
 type Input struct {
@@ -14,9 +12,22 @@ type Input struct {
 	Line int `form:"line"`
 }
 
-func ParseInput(c *gin.Context) (input Input, err error) {
+type Handler struct {
+	ScheduleGenerator interfaces.ScheduleGenerator
+}
+
+var ScheduleHandler Handler
+
+func NewHandler(generator interfaces.ScheduleGenerator) Handler {
+
+	return Handler{
+		ScheduleGenerator: generator,
+	}
+}
+
+func (*Handler) ParseInput(c *gin.Context) (input Input, err error) {
 	err = c.Bind(&input)
-	stop , passed := c.Params.Get("number")
+	stop, passed := c.Params.Get("number")
 	if !passed {
 		err = errors.New("Number was not passed")
 		return
@@ -26,32 +37,11 @@ func ParseInput(c *gin.Context) (input Input, err error) {
 	return
 }
 
-func Handler(c *gin.Context) {
-	input, err := ParseInput(c)
+func (this *Handler) Serve(c *gin.Context) {
+	input, err := this.ParseInput(c)
 	if err != nil {
 		c.JSON(400, gin.H{"result": false, "error": err.Error()})
 	}
-	schedule := GenerateSchedule(input.Stop)
+	schedule := this.ScheduleGenerator.GenerateSchedule(input.Stop)
 	c.JSON(200, schedule)
-}
-
-func GenerateSchedule(busStop int) map[int][]int {
-	response := services.CallSumc(busStop)
-	schedule := make(map[int][]int)
-	now := time.Now().UTC().Add(3 * time.Hour)
-	ymd := now.Format("2006-01-02")
-
-	for _, line := range response.Lines {
-		lineNumber, _ := strconv.Atoi(line.Name)
-		for _, arrival := range line.Arrivals {
-			if _, ok := schedule[lineNumber]; !ok {
-				schedule[lineNumber] = []int{}
-			}
-			tt, _ := time.Parse("2006-01-02 15:04:05", ymd+" "+arrival.Time)
-			minutes := math.Round(tt.Sub(now).Minutes())
-			schedule[lineNumber] = append(schedule[lineNumber], int(minutes))
-		}
-	}
-
-	return schedule
 }

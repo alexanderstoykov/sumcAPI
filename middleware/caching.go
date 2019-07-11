@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
 	"bytes"
+	"github.com/gin-gonic/gin"
+	"sumcAPI/cache"
 	"sumcAPI/handlers"
 	"sumcAPI/workers"
-	"sumcAPI/cache"
 	"time"
 )
 
@@ -23,7 +23,7 @@ func Caching(c *gin.Context) {
 	blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 	c.Writer = blw
 
-	input, err := handlers.ParseInput(c)
+	input, err := handlers.ScheduleHandler.ParseInput(c)
 	if err != nil {
 		c.JSON(400, gin.H{"result": false, "error": err.Error()})
 	}

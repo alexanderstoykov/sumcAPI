@@ -1,8 +1,8 @@
 package cache
 
 import (
-	"sync"
 	"errors"
+	"sync"
 )
 
 var Mutex = &sync.Mutex{}
